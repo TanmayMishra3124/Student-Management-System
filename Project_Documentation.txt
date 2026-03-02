@@ -1,0 +1,134 @@
+Student Management System - Complete Project Documentation
+
+1. Project Overview
+   The Student Management System is a full-stack web application designed to manage student records. It allows users to perform basic CRUD (Create, Read, Update, Delete) operations on student data.
+   The project is divided into two main components:
+
+* Backend: An ASP.NET Core 8 Web API (StudentManagement.API)
+* Frontend: A React SPA built with Vite (student-management-ui)
+
+2. Backend details (StudentManagement.API)
+
+The backend is built using .NET 8 Web API. It serves as the data layer and exposes RESTful endpoints for the frontend to consume.
+
+Tech Stack & Libraries
+
+* Framework: ASP.NET Core Web API
+* Language: C#
+* Database: SQLite (via Entity Framework Core)
+* ORM: Entity Framework Core (Microsoft.EntityFrameworkCore.Sqlite)
+* Documentation: Swagger UI
+
+Core Architecture
+
+a) Models (Models/Student.cs)
+The primary entity is Student. It contains the following properties:
+
+* Id (int) - Primary Key
+* Name (string) - Required
+* Email (string) - Required, must be a valid Email Address
+* Course (string)
+
+b) Data Access (Data/AppDbContext.cs)
+Entity Framework Core is used for database communication. The AppDbContext inherits from DbContext and exposes a DbSet<Student> Students, representing the database table.
+
+c) API Controllers (Controllers/StudentsController.cs)
+The controller handles incoming HTTP requests at the route /api/students. It injects the AppDbContext to interact with the database.
+Endpoints provided:
+
+1. GET /api/students - Retrieves a list of all students (GetStudents).
+2. GET /api/students/{id} - Retrieves a single student by ID (GetStudent). Returns 404 if not found.
+3. POST /api/students - Creates a new student (PostStudent). Returns 201 CreatedAtAction.
+4. PUT /api/students/{id} - Updates an existing student's data (PutStudent). Returns 204 NoContent or 404/400 errors.
+5. DELETE /api/students/{id} - Deletes a student by ID (DeleteStudent). Returns 204 NoContent or 404.
+
+d) Application Entry Point (Program.cs)
+
+* Registers controllers and configures Swagger/OpenAPI for API documentation.
+* Registers the AppDbContext to use an SQLite database (connection string: "DefaultConnection").
+* Configures a CORS policy named "AllowReactApp", which allows any origin, any method, and any header, to facilitate communication with the local React frontend.
+* Sets up middleware pipeline (Swagger, CORS, Authorization, MapControllers).
+
+3. Frontend details (student-management-ui)
+
+The frontend is a Single Page Application (SPA) built with React.
+
+Tech Stack & Libraries
+
+* Framework: React (Bootstrapped with Vite)
+* Routing: react-router-dom
+* HTTP Client: axios
+* Styling: Standard CSS (index.css)
+
+Core Architecture
+
+a) Entry Point (App.jsx)
+
+* Wraps the entire application in a BrowserRouter (Router).
+* Contains a simple navigation bar with links to "Home" (/) and "Add Student" (/add).
+* Defines three main routes:
+
+  * / -> StudentList component.
+  * /add -> AddStudent component.
+  * /edit/:id -> EditStudent component.
+
+b) API Services (services/api.js)
+
+* Uses Axios to communicate with the backend.
+* Sets the base URL to [http://localhost:5000/api/students](http://localhost:5000/api/students).
+* Exports functions corresponding to the Backend's CRUD endpoints:
+
+  * getStudents(): GET /
+  * getStudent(id): GET /{id}
+  * createStudent(student): POST /
+  * updateStudent(id, student): PUT /{id}
+  * deleteStudent(id): DELETE /
+
+c) Components
+
+* StudentForm (components/StudentForm.jsx): A reusable form component used for both creating and editing students. It maintains a local state for name, email, and course. It accepts an initialData prop (used during editing), an onSubmit callback, and a buttonText prop.
+
+d) Pages
+
+1. StudentList (pages/StudentList.jsx):
+
+   * Fetches all students using getStudents API on component mount (useEffect).
+   * Renders them in an HTML <table>.
+   * Provides "Edit" link (routes to /edit/{id}) and a "Delete" button.
+   * Delete button calls deleteStudent API and triggers a re-fetch of the student list. Before deletion, it prompts a browser window.confirm.
+
+2. AddStudent (pages/AddStudent.jsx):
+
+   * Uses the StudentForm component.
+   * On Form submission, it calls the createStudent API with the provided form data.
+   * Navigates back to the index route (/) upon specific completion.
+
+3. EditStudent (pages/EditStudent.jsx):
+
+   * Extracts the student id from the URL via useParams().
+   * Fetches the current student's data using getStudent(id) and sets it as initialData.
+   * Renders StudentForm populated with fetched initialData.
+   * On submission, calls updateStudent(id, studentData) and redirects back to the index route (/).
+
+4. How to Run the Project
+
+Running the Backend
+
+1. Open terminal and navigate to StudentManagement.API.
+2. Restore packages: dotnet restore
+3. Apply database migrations:
+
+   * dotnet ef migrations add InitialCreate
+   * dotnet ef database update
+4. Run the API: dotnet run (Runs by default on [http://localhost:5000](http://localhost:5000))
+
+Running the Frontend
+
+1. Open a new terminal and navigate to student-management-ui.
+2. Install NodeJS dependencies: npm install
+3. Run Vite dev server: npm run dev (Runs by default on [http://localhost:5173](http://localhost:5173))
+
+Accessing the App
+
+* The application UI can be accessed at [http://localhost:5173](http://localhost:5173).
+* The backend Swagger API documentation can be accessed at [http://localhost:5000/swagger](http://localhost:5000/swagger).

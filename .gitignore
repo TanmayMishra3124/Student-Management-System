@@ -1,0 +1,24 @@
+# .NET
+bin/
+obj/
+*.user
+*.lock.json
+.vs/
+.vscode/
+
+# Node.js
+node_modules/
+dist/
+.env
+.DS_Store
+coverage/
+npm-debug.log
+yarn-error.log
+
+# SQLite
+*.db
+*.db-shm
+*.db-wal
+
+# Logging
+*.log
